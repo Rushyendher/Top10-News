@@ -1,9 +1,12 @@
 package com.rushyendher.top10_news;
 
 import android.app.LoaderManager;
+import android.content.Intent;
 import android.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -18,9 +21,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private static final int SOURCE_LOADER_ID = 1;
 
     private ArrayAdapter<String> mAdapter;
-    private List<String> mCategories = null;
-    private Map<String, List<SourcesInfo> > sourceInfo = null;
-
+    private Map<String, ArrayList<SourcesInfo> > sourceInfo = null;
+    private ListView mCategoriesListView;
+    private ArrayList<CategoriesToSource> categoriesToSources = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,13 +33,26 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         LoaderManager loaderManager = getLoaderManager();
         loaderManager.initLoader(SOURCE_LOADER_ID,null,this);
 
+
+        mCategoriesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                CategoriesToSource categoriesToSource = categoriesToSources.get(position);
+
+                Intent intent = new Intent(MainActivity.this,SourcesActivity.class);
+
+                intent.putParcelableArrayListExtra("SOURCES",categoriesToSource.getSourcesInfos());
+                startActivity(intent);
+            }
+        });
+
     }
 
     private void UpdateUI()
     {
-        ListView categoriesListView = (ListView)findViewById(R.id.category_list);
+        mCategoriesListView = (ListView)findViewById(R.id.category_list);
         mAdapter = new ArrayAdapter<String>(this,R.layout.category_list_view,new ArrayList<String>());
-        categoriesListView.setAdapter(mAdapter);
+        mCategoriesListView.setAdapter(mAdapter);
     }
 
     @Override
@@ -46,17 +62,22 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onLoadFinished(Loader<List<SourcesInfo>> loader, List<SourcesInfo> data) {
+        mAdapter.clear();
         if(data != null && !data.isEmpty())
         {
             createCategories(data);
-            if(mCategories != null)
-                mAdapter.addAll(mCategories);
+            if(categoriesToSources != null)
+            {
+                for(int i = 0;i<categoriesToSources.size();i++)
+                    mAdapter.add(categoriesToSources.get(i).getmCategory());
+            }
         }
+        sourceInfo.clear();
     }
 
     private void createCategories(List<SourcesInfo> data)
     {
-        mCategories = new ArrayList<String>();
+        categoriesToSources = new ArrayList<>();
         sourceInfo = new HashMap<>();
         for(int i = 0;i<data.size();i++)
         {
@@ -66,13 +87,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 sourceInfo.get(category).add(source);
             else
             {
-                List<SourcesInfo> firstSource = new ArrayList<>();
+                ArrayList<SourcesInfo> firstSource = new ArrayList<>();
                 firstSource.add(source);
                 sourceInfo.put(category,firstSource);
             }
         }
         for (String key : sourceInfo.keySet())
-            mCategories.add(key);
+        {
+            categoriesToSources.add(new CategoriesToSource(key,sourceInfo.get(key)));
+        }
     }
 
     @Override

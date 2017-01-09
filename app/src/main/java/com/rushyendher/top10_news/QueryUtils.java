@@ -110,14 +110,9 @@ public final class QueryUtils {
                     String category = source.getString("category");
 
                     JSONObject urlToLogo = source.getJSONObject("urlsToLogos");
-
                     String logoURL = urlToLogo.getString("small");
-                    JSONArray sortByAvailable = source.getJSONArray("sortBysAvailable");
-                    List<String> sortOptions = new ArrayList<>();
-                    for (int j = 0;j<sortByAvailable.length();j++)
-                        sortOptions.add((String) sortByAvailable.get(j));
 
-                    sourcesInfos.add(new SourcesInfo(id,name,description,url,category,logoURL,sortOptions));
+                    sourcesInfos.add(new SourcesInfo(id,name,description,url,category,logoURL));
                 }
             }
 
