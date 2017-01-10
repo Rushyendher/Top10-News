@@ -121,4 +121,31 @@ public final class QueryUtils {
         }
         return sourcesInfos;
     }
+
+    public static List<ArticleInfo> parseArticleJSON(String jsonResponse)
+    {
+        if(jsonResponse == null)
+            return null;
+        List<ArticleInfo> articleInfos = new ArrayList<>();
+        try {
+            JSONObject jsonObject = new JSONObject(jsonResponse);
+            JSONArray articles = jsonObject.getJSONArray("articles");
+
+            for (int i = 0;i<articles.length();i++)
+            {
+                JSONObject article = articles.getJSONObject(i);
+                String author = article.getString("author");
+                String title = article.getString("title");
+                String description = article.getString("description");
+                String url = article.getString("url");
+                String urlToImage = article.getString("urlToImage");
+                String publishedDate = article.getString("publishedAt");
+
+                articleInfos.add(new ArticleInfo(author,title,description,url,urlToImage,publishedDate));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return articleInfos;
+    }
 }
