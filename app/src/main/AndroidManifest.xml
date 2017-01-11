@@ -21,8 +21,9 @@
         </activity>
         <activity
             android:name=".SourcesActivity"
-            android:label="Sources"></activity>
-        <activity android:name=".ArticlesActivity"></activity>
+            android:label="Sources" />
+        <activity android:name=".ArticlesActivity" />
+        <activity android:name=".DescriptionActivity"></activity>
     </application>
 
 </manifest>

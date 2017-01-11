@@ -1,9 +1,12 @@
 package com.rushyendher.top10_news;
 
 import android.app.LoaderManager;
+import android.content.Intent;
 import android.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -16,7 +19,7 @@ public class ArticlesActivity extends AppCompatActivity implements LoaderManager
     private static final int SOURCE_LOADER_ID = 1;
     private ListView articlesListView;
     private ArticleAdapter adapter;
-
+    private List<ArticleInfo> articleInfoList = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,6 +33,19 @@ public class ArticlesActivity extends AppCompatActivity implements LoaderManager
         LoaderManager loaderManager = getLoaderManager();
         loaderManager.initLoader(SOURCE_LOADER_ID,null,this);
 
+        articlesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                ArticleInfo articleInfo = articleInfoList.get(position);
+                Intent intent = new Intent(ArticlesActivity.this,DescriptionActivity.class);
+                intent.putExtra("AUTHOR",articleInfo.getmAuthor());
+                intent.putExtra("TITLE",articleInfo.getmTitle());
+                intent.putExtra("DESCRIPTION",articleInfo.getmDescription());
+                intent.putExtra("URL",articleInfo.getmUrl());
+                intent.putExtra("URL_TO_IMAGE",articleInfo.getmUrlToImage());
+                startActivity(intent);
+            }
+        });
     }
 
     private void updateUI()
@@ -47,9 +63,11 @@ public class ArticlesActivity extends AppCompatActivity implements LoaderManager
     @Override
     public void onLoadFinished(Loader<List<ArticleInfo>> loader, List<ArticleInfo> data) {
         adapter.clear();
+        articleInfoList = new ArrayList<>();
         if(data != null && !data.isEmpty())
         {
             adapter.addAll(data);
+            articleInfoList.addAll(data);
         }
     }
 
