@@ -21,6 +21,9 @@ public class SourcesActivity extends AppCompatActivity {
         ListView listView = (ListView)findViewById(R.id.activity_sources_list);
         listView.setAdapter(sourceAdapter);
 
+        String title = getIntent().getStringExtra("SOURCE");
+        setTitle(title + " sources");
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {

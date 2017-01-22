@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 CategoriesToSource categoriesToSource = categoriesToSources.get(position);
 
                 Intent intent = new Intent(MainActivity.this,SourcesActivity.class);
+                intent.putExtra("SOURCE",categoriesToSource.getmCategory());
 
                 intent.putParcelableArrayListExtra("SOURCES",categoriesToSource.getSourcesInfos());
                 startActivity(intent);
