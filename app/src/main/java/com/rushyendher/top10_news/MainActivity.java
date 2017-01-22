@@ -1,14 +1,18 @@
 package com.rushyendher.top10_news;
 
 import android.app.LoaderManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,14 +28,32 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private Map<String, ArrayList<SourcesInfo> > sourceInfo = null;
     private ListView mCategoriesListView;
     private ArrayList<CategoriesToSource> categoriesToSources = null;
+    private TextView mEmptyStateTextView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         UpdateUI();
 
-        LoaderManager loaderManager = getLoaderManager();
-        loaderManager.initLoader(SOURCE_LOADER_ID,null,this);
+
+
+        ConnectivityManager connectivityManager = (ConnectivityManager)
+                getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+
+        if(networkInfo != null && networkInfo.isConnected())
+        {
+            LoaderManager loaderManager = getLoaderManager();
+            loaderManager.initLoader(SOURCE_LOADER_ID,null,this);
+        }
+        else
+        {
+
+            View loadingIndicator = findViewById(R.id.loading_indicator);
+            loadingIndicator.setVisibility(View.GONE);
+            mEmptyStateTextView.setText("I am not connected :(");
+        }
 
 
         mCategoriesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -52,6 +74,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     {
         mCategoriesListView = (ListView)findViewById(R.id.category_list);
         mAdapter = new ArrayAdapter<String>(this,R.layout.category_list_view,new ArrayList<String>());
+        mEmptyStateTextView = (TextView) findViewById(R.id.empty_view);
         mCategoriesListView.setAdapter(mAdapter);
     }
 
@@ -62,6 +85,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onLoadFinished(Loader<List<SourcesInfo>> loader, List<SourcesInfo> data) {
+        View loadingIndicator = findViewById(R.id.loading_indicator);
+        loadingIndicator.setVisibility(View.GONE);
         mAdapter.clear();
         if(data != null && !data.isEmpty())
         {
